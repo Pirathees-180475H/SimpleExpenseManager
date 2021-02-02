@@ -21,6 +21,7 @@ public class EmbeddedDemoExpenseManager extends ExpenseManager{
 
         //create db
         SQLiteDatabase database = context.openOrCreateDatabase("180475H", context.MODE_PRIVATE, null);
+
         //create Account Table
         database.execSQL("CREATE TABLE IF NOT EXISTS Account(" + "accountNo VARCHAR(50) PRIMARY KEY," + "bankName VARCHAR(50),"
                 +"accountHolderName VARCHAR(50)," + "balance REAL" + " );");

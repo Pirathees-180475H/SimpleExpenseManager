@@ -34,10 +34,10 @@ lk/ac/mrt/cse/dbs/simpleexpensemanager/control/InMemoryDemoExpenseManager.java
  lk.ac.mrt.cse.dbs.simpleexpensemanager.control.InMemoryDemoExpenseManager
 lk/ac/mrt/cse/dbs/simpleexpensemanager/data/impl/EmbeddedTransactionDAO.java
  lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl.EmbeddedTransactionDAO
-lk/ac/mrt/cse/dbs/simpleexpensemanager/data/impl/EmbeddedAccountDAO.java
- lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl.EmbeddedAccountDAO
 lk/ac/mrt/cse/dbs/simpleexpensemanager/ui/MainActivity.java
  lk.ac.mrt.cse.dbs.simpleexpensemanager.ui.MainActivity
  lk.ac.mrt.cse.dbs.simpleexpensemanager.ui.MainActivity$SectionsPagerAdapter
+lk/ac/mrt/cse/dbs/simpleexpensemanager/data/impl/EmbeddedAccountDAO.java
+ lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl.EmbeddedAccountDAO
 lk/ac/mrt/cse/dbs/simpleexpensemanager/control/EmbeddedDemoExpenseManager.java
  lk.ac.mrt.cse.dbs.simpleexpensemanager.control.EmbeddedDemoExpenseManager

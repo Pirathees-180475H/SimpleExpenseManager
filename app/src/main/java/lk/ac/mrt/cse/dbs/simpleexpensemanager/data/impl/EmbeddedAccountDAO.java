@@ -11,66 +11,54 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.AccountDAO;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
-
+//pts
 // I implement
 public class EmbeddedAccountDAO  implements AccountDAO {
-
     SQLiteDatabase database;
+    public EmbeddedAccountDAO(SQLiteDatabase database){
 
-    public EmbeddedAccountDAO(SQLiteDatabase db){
-        this.database = db;
+        this.database = database;
     }
 
     @Override
+    //account Numbs
     public List<String> getAccountNumbersList() {
         List<String> AccNumbs = new ArrayList<>();
-        //account Numbs
+
         Cursor cursor = database.rawQuery("SELECT accountNo FROM Account", null);
         try {
             if (cursor.moveToFirst()) {
                 do {
                     String test=cursor.getString(cursor
                             .getColumnIndex("accountNo"));
-
                     AccNumbs.add(test);
-
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (cursor != null && !cursor.isClosed()) {
+            if (cursor != (null) && !cursor.isClosed()) {
                 cursor.close();
             }
-        }
-
-        return AccNumbs;
+        }return AccNumbs;
     }
-
     @Override
 
-    //fetch all account details
+    //  get All account details from embeded DB
     public List<Account> getAccountsList() {
-        List<Account> accountdetail = new ArrayList<>();
+        List<Account> AccountDetails = new ArrayList<>();
 
-        String ACCOUNT_DETAIL_SELECT_QUERY = "SELECT * FROM Account";
-
-
-        Cursor cursor = database.rawQuery(ACCOUNT_DETAIL_SELECT_QUERY, null);
+        Cursor cursor = database.rawQuery("SELECT * FROM Account", null);
 
         try {
             if (cursor.moveToFirst()) {
                 do {
-                    Account acc=new Account(
+                    Account account=new Account(
                             cursor.getString(cursor.getColumnIndex("accountNo")),
                             cursor.getString(cursor.getColumnIndex("bankName")),
                             cursor.getString(cursor.getColumnIndex("accountHolderName")),
                             cursor.getDouble(cursor.getColumnIndex("balance")));
-
-
-
-
-                    accountdetail.add(acc);
+                    AccountDetails.add(account);
 
                 } while (cursor.moveToNext());
             }
@@ -80,68 +68,64 @@ public class EmbeddedAccountDAO  implements AccountDAO {
             if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
             }
-        }
-
-        return accountdetail;
+        }return AccountDetails;
 
     }
 
-    //get account details for a particular account number
+
+
+    //particular account number details
     @Override
     public Account getAccount(String accountNo) throws InvalidAccountException {
-        String ACCOUNT_SELECT_QUERY = "SELECT * FROM Account where accountNo = "+accountNo;
-
-        Cursor cursor = database.rawQuery(ACCOUNT_SELECT_QUERY, null);
+        Cursor cursor = database.rawQuery("SELECT * FROM Account where accountNo = "+accountNo, null);
         if (cursor != null)
             cursor.moveToFirst();
 
-        Account td = new Account(
+        Account par_Acc = new Account(
                 cursor.getString(cursor.getColumnIndex("accountNo")),
                 cursor.getString(cursor.getColumnIndex("bankName")),
                 cursor.getString(cursor.getColumnIndex("accountHolderName")),
                 cursor.getDouble(cursor.getColumnIndex("balance")));
 
 
-        return td;
+        return par_Acc;
 
     }
 
-    //add account
+    //add new account to Db
     @Override
     public void addAccount(Account account) {
         String sql = "INSERT INTO Account (accountNo,bankName,accountHolderName,balance) VALUES (?,?,?,?)";
-        SQLiteStatement statement = database.compileStatement(sql);
+        SQLiteStatement SQLst = database.compileStatement(sql);
 
+        SQLst.bindString(1, account.getAccountNo());
+        SQLst.bindString(2, account.getBankName());
+        SQLst.bindString(3, account.getAccountHolderName());
+        SQLst.bindDouble(4, account.getBalance());
 
-
-        statement.bindString(1, account.getAccountNo());
-        statement.bindString(2, account.getBankName());
-        statement.bindString(3, account.getAccountHolderName());
-        statement.bindDouble(4, account.getBalance());
-
-
-        statement.executeInsert();
+        SQLst.executeInsert();
     }
+
+
 
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void removeAccount(String accountNo) throws InvalidAccountException {
 
-        String sqlquery = "DELETE FROM Account WHERE accountNo = ?";
-        SQLiteStatement statement = database.compileStatement(sqlquery);
 
-        statement.bindString(1,accountNo);
+        SQLiteStatement sqlst = database.compileStatement("DELETE FROM Account WHERE accountNo = ?");
 
-        statement.executeUpdateDelete();
+        sqlst.bindString(1,accountNo);
+
+        sqlst.executeUpdateDelete();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void updateBalance(String accountNo, ExpenseType expense_Type, double _amount) throws InvalidAccountException {
 
-        String sqlquery = "UPDATE Account SET balance = balance + ?";
-        SQLiteStatement statement = database.compileStatement(sqlquery);
+        SQLiteStatement statement = database.compileStatement("UPDATE Account SET balance = balance + ?");
         if(expense_Type == ExpenseType.EXPENSE){
             statement.bindDouble(1,-_amount);
         }else{

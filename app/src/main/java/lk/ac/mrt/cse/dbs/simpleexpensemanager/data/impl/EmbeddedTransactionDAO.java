@@ -17,15 +17,11 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
 
 public class EmbeddedTransactionDAO implements TransactionDAO {
 
-    //transaction table
+    SQLiteDatabase database;
 
+    public EmbeddedTransactionDAO(SQLiteDatabase database){
 
-
-    SQLiteDatabase db;
-
-    public EmbeddedTransactionDAO(SQLiteDatabase db){
-
-        this.db=db;
+        this.database=database;
     }
 
 
@@ -33,19 +29,15 @@ public class EmbeddedTransactionDAO implements TransactionDAO {
     //insert values into transaction table
     public void logTransaction(Date date_, String accountNo, ExpenseType expenseType_, double amount_){
 
+        SQLiteStatement sqlst = database.compileStatement("INSERT INTO Account_Transaction " +
+                "(accountNo,expenseType,amount,date) VALUES (?,?,?,?)");
 
+        sqlst.bindString(1,accountNo);
+        sqlst.bindLong(2,(expenseType_ == ExpenseType.EXPENSE) ? 0 : 1);
+        sqlst.bindDouble(3,amount_);
+        sqlst.bindLong(4,date_.getTime());
 
-        String insert_query = "INSERT INTO Account_Transaction (accountNo,expenseType,amount,date) VALUES (?,?,?,?)";
-        SQLiteStatement statement = db.compileStatement(insert_query);
-
-        statement.bindString(1,accountNo);
-        statement.bindLong(2,(expenseType_ == ExpenseType.EXPENSE) ? 0 : 1);
-        statement.bindDouble(3,amount_);
-        statement.bindLong(4,date_.getTime());
-
-        statement.executeInsert();
-
-
+        sqlst.executeInsert();
 
     }
 
@@ -54,22 +46,18 @@ public class EmbeddedTransactionDAO implements TransactionDAO {
     public List<Transaction> getAllTransactionLogs() {
         List<Transaction> transactions = new ArrayList<>();
 
-        String TRANSACTION_DETAIL_SELECT_QUERY = "SELECT * FROM Account_Transaction";
-        Cursor cursor = db.rawQuery(TRANSACTION_DETAIL_SELECT_QUERY, null);
+        Cursor cursor = database.rawQuery("SELECT * FROM Account_Transaction", null);
 
         try {
             if (cursor.moveToFirst()) {
                 do {
-                    Transaction trans=new Transaction(
+                    Transaction transaction=new Transaction(
                             new Date(cursor.getLong(cursor.getColumnIndex("date"))),
                             cursor.getString(cursor.getColumnIndex("accountNo")),
                             (cursor.getInt(cursor.getColumnIndex("expenseType")) == 0) ? ExpenseType.EXPENSE : ExpenseType.INCOME,
                             cursor.getDouble(cursor.getColumnIndex("amount")));
 
-
-
-
-                    transactions.add(trans);
+                    transactions.add(transaction);
 
                 } while (cursor.moveToNext());
             }
@@ -80,39 +68,29 @@ public class EmbeddedTransactionDAO implements TransactionDAO {
                 cursor.close();
             }
         }
-
-
         return transactions;
     }
 
     @Override
     public List<Transaction> getPaginatedTransactionLogs(int limit) {
-        //int size =int numRows = DatabaseUtils.queryNumEntries( Table_1);;
+        List<Transaction> TransDetail = new ArrayList<>();
 
-
-        List<Transaction> transdetail = new ArrayList<>();
-
-        String TRANS_DETAIL_SELECT_QUERY = "SELECT * FROM Account_Transaction LIMIT"+limit;
-
-
-        Cursor cursor = db.rawQuery(TRANS_DETAIL_SELECT_QUERY, null);
+        Cursor cursor = database.rawQuery("SELECT * FROM Account_Transaction LIMIT"+limit, null);
 
 
         if (cursor.moveToFirst()) {
             do {
-                Transaction trans=new Transaction(
+                Transaction transaction=new Transaction(
                         new Date(cursor.getLong(cursor.getColumnIndex("date"))),
                         cursor.getString(cursor.getColumnIndex("accountNo")),
                         (cursor.getInt(cursor.getColumnIndex("expenseType")) == 0) ? ExpenseType.EXPENSE : ExpenseType.INCOME,
                         cursor.getDouble(cursor.getColumnIndex("amount")));
 
 
-                transdetail.add(trans);
+                TransDetail.add(transaction);
 
             } while (cursor.moveToNext());
-        }
-
-        return  transdetail;
+        }return  TransDetail;
     }
 
 
